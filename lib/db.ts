@@ -45,7 +45,9 @@ declare global {
 }
 
 function createDatabase() {
-  const dataDir = path.join(process.cwd(), "data");
+  // Vercel's serverless functions have a read-only filesystem except /tmp,
+  // so the project's own data/ directory can't be written to in production.
+  const dataDir = process.env.VERCEL ? path.join("/tmp", "assetiq-data") : path.join(process.cwd(), "data");
   fs.mkdirSync(dataDir, { recursive: true });
   const database = new Database(path.join(dataDir, "assetiq.db"));
   database.pragma("journal_mode = WAL");
